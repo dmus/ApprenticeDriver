@@ -7,25 +7,37 @@ function trajectory = build_trajectory(filename, k, H)
     % Remove states and actions before start signal
     sensors = S.States(S.States(:,2) > 0,:);
     actuators = S.Actions(S.States(:,2) > 0,:);
-
+    times = compute_discretized_times(sensors(1:H,:));
     
-    S = zeros(H, k*8-2);
+    X = zeros(H, k*8);
     
-    S(:,1:6) = compute_states(sensors(1:H,:), true);
-    U = compute_actions(actuators(1:H-1,:));
+    X(:,3:8) = compute_states(sensors(1:H,:), true);
+    U = compute_actions(actuators(1:H,:));
+    X(:,1:2) = U;
     
-    % TODO rotate to right body frame
-    j = 6; % Pointer to last element that is speficied
-    for i = 1:k-1
-        S(1+i:end,j+1:j+2) = U(1:end-i+1,:);
-        j = j+2;
-        S(1:1+i-1,j+4:j+6) = repmat(S(1,4:6),1+i-1,1);
-        S(1+i:end,j+1:j+6) = S(1:end-i,1:6);
-        j = j+6;
+    % Rotate
+    for i = 0:k-2
+        % 2 control inputs, 6 state inputs, total 8
+        first = i*8+1;
+        last = first+8-1;
+        
+        U_prev = X(:,first:first+2-1);
+        S_prev = X(:,first+2:last);
+        
+        for t = 1:H-(i+1)
+            dt = times(t+1) - times(t);
+            angle = S_prev(t+1,3) * dt;
+            Rot = [cos(angle) -sin(angle); sin(angle) cos(angle)];
+            S_prev(t,1:2) = (Rot * S_prev(t,1:2)')';
+        end
+        
+        X(2:end,first+8:last+8) = [U_prev(1:end-1,:) S_prev(1:end-1,:)];
     end
+    
+    S = X(:,3:end);
     
     trajectory.S = S(1:H,:);
     trajectory.U = U;
-    trajectory.T = compute_discretized_times(sensors);
+    trajectory.T = times;
 end
 

@@ -1,6 +1,6 @@
 function segments = segment(Points, threshold)
-%SEGMENT Summary of this function goes here
-%   Detailed explanation goes here
+%SEGMENT Rangefinders are segmented to distinguish left and right edge.
+%   Segments containts per row the first and last index. 
 
     % Compute squared distances between consecutive points
     distances = Points(2:end,:) - Points(1:end-1,:);

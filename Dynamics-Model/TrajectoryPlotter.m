@@ -20,7 +20,7 @@ classdef TrajectoryPlotter
             plot(x, this.U(from:to,2), '--b', x, this.S(from:to,3), '-r');
             h = legend('$u_s$', '$\dot{\omega}$');
             set(h,'Interpreter','latex');
-            set(h,'FontSize',14);
+            set(h,'FontSize',20);
         end
     end
     

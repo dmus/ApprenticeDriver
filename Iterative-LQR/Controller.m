@@ -5,7 +5,7 @@ classdef Controller < handle
     properties
         t                   % Current timestep
         sensors             % Current raw sensor readings
-        sensorsPrev        % Sensor readings at time t-1
+        sensorsPrev         % Sensor readings at time t-1
         state               % Current full state
         K                   % Optimal time-varying policy
         P                   % Time-varying cost-to-go function
@@ -24,10 +24,15 @@ classdef Controller < handle
         Q                   % LQR cost matrix
         R                   % LQR cost matrix
         vPrev
-        stateDim           % Number of elements in state
-        actionDim          % Number of elements in action
+        stateDim            % Number of elements in state
+        actionDim           % Number of elements in action
         bias
-        useBias            % Setting for using inaccurate model algoritm or not
+        useBias             % Setting for using inaccurate model algoritm or not
+        stage
+        trackName
+        u
+        gearChangeBehaviour
+        clutchBehaviour
     end
     
     methods
@@ -51,9 +56,13 @@ classdef Controller < handle
             
             obj.alpha = 0; 
             obj.rangeFinderIndices = (1:19) + 49;
-            obj.angles = transp(((obj.rangeFinderIndices - 10) / 9) * (0.5*pi) * -1);
+            indices = 1:19;
+            obj.angles = transp(((indices - 10) / 9) * (0.5*pi) * -1);
             obj.options = optimset('LargeScale', 'off', 'TolX', 0.0001, 'Display', 'off');
             obj.useBias = false;
+            
+            obj.gearChangeBehaviour = GearChangeBehaviour();
+            obj.clutchBehaviour = ClutchBehaviour();
             
             obj.onStart();
             
@@ -66,6 +75,7 @@ classdef Controller < handle
             this.episode = this.episode + 1;
             this.vPrev = zeros(this.actionDim,1);
             this.state = zeros(this.stateDim,1);
+            this.u = zeros(this.actionDim,1);
             
             this.history.S = zeros(this.H, this.stateDim);
             this.history.U = zeros(this.H, this.actionDim);
@@ -85,8 +95,20 @@ classdef Controller < handle
                 this.bias = zeros(this.H-1, this.stateDim);
             end
                 
-            [this.A, this.B, this.Q, this.R] = approximate_lqr(this.reference, this.alpha, this.model, this.map, this.bias);
+            [this.A, this.B, this.Q, this.R] = approximate_lqr(this.reference, @f, @g_constantspeed, this.alpha, this.model, this.map, this.bias);
             [this.K, this.P] = create_time_varying_controller(this.A, this.B, this.Q, this.R, this.Q{this.H});
+        end
+        
+        function setStage(this, stage)
+            this.stage = stage;
+        end
+        
+        function setTrackName(this, trackName)
+            this.trackName = trackName;
+        end
+        
+        function angles = initAngles(this)
+            angles = -90:10:90;
         end
         
         % Sensors is a long vector containing sensor measurements
@@ -95,10 +117,10 @@ classdef Controller < handle
             this.sensorsPrev = this.sensors;
             this.sensors = sensors;
             
+            action = zeros(7,1);
+            
             % If start sign is not given yet
             if this.sensors(2) < 0
-                this.state = [this.sensors([47 48]); 0];%; this.sensors([4 69 1]); 1; this.previousState(1:7)];%; this.previousAction];
-                u = zeros(this.action_dim,1);
                 return;
             end
             
@@ -106,20 +128,25 @@ classdef Controller < handle
             s = this.computeState();
             u = this.controlFromState(s, this.sensors(2)); % TODO fix for new lap
             
+            % Store u
+            this.u = u;
+            
             % Check if accelerating or braking
             if u(1) > 0
-                action = [u(1); 0; u(2)];
+                action([1 2 5]) = [u(1); 0; u(2)];
             else
-                action = [0; -1 * u(1); u(2)];
+                action([1 2 5]) = [0; -1 * u(1); u(2)];
             end
+            
+            action = this.gearChangeBehaviour.execute(sensors, action);
+            action = this.clutchBehaviour.execute(sensors, action);
         end
         
         function u = controlFromState(this, state, curtime)
             % Increase timestep
             this.t = this.t + 1;
             
-            % Save previous state
-            %this.statePrev = this.state;
+            % Save state
             this.state = state;
             
             this.history.T(this.t,:) = curtime;
@@ -127,7 +154,7 @@ classdef Controller < handle
             
             if this.t >= this.H
                 % Output does not matter, because trial has ended
-                u = zeros(this.action_dim,1);
+                u = zeros(this.actionDim,1);
                 return;
             end
             
@@ -145,22 +172,15 @@ classdef Controller < handle
         function reset(this)
             disp('resetting...');
             
-            % Compute total costs
-            cost = 0;
-            for t = 1:this.H - 1
-                cost = cost + g(this.history.S(t,:)') + h(this.history.U(t,:)');
-            end
-            cost = cost + g(this.history.S(this.H,:)');
-            
-            fprintf('Final cost for episode %i: %f\n', this.episode, cost);
-            
-            this.alpha = this.alpha - 0.1;
+            this.clutchBehaviour.reset();
+            this.gearChangeBehaviour.reset();
+            %this.alpha = this.alpha - 0.1;
             
             % Compute and solve new optimal control problem
             
             % this.reference = this.history;
             
-            this.onStart();
+            %this.onStart();
         end
         
         function shutdown(this)
@@ -172,21 +192,20 @@ classdef Controller < handle
             
             % Forward and lateral speed in m/s
             s(1:2) = this.sensors(47:48) * 1000 / 3600;
-            %s(1) = this.sensors(47) * 1000 / 3600;
-            
             
             % Angular velocity in rad/s
             s(3) = this.estimateYawrate();
 
-%             % State features
-%             s(4:6) = this.sensors([4 69 1]);
-%             
-%             % And remaining elements
-%             s(7) = 1;
-%             s(8:14) = this.previousState(1:7);
-%             
-%             % Also previous action in state
-%             %s(15:17) = this.previousAction;
+            % State features
+            s(4:6) = this.sensors([4 69 1]);
+            
+            % Control input from previous timestep
+            s(7:8) = this.u;
+            
+            % Shift previous states
+            s(9:end) = this.state(1:end-8);
+            
+            % TODO rotate
         end
         
         % Estimate yaw rate at time t.
@@ -198,7 +217,7 @@ classdef Controller < handle
             ALPHA = 0.805; 
             
             % Current guess
-            yawRate = 0;%this.previousState(3);
+            yawrate = 0;%this.previousState(3);
             
             % Compute marks at time t-1 for the reference scan
             ranges = this.sensorsPrev(this.rangeFinderIndices);
@@ -208,21 +227,21 @@ classdef Controller < handle
                 [marksLeft, marksRight] = groupRangeFinders(marks, 10);
 
                 % Compute move in body coordinate frame
-                move = (this.statePrev(1:2)' + this.state(1:2)') .* 0.5 .* dt;
+                move = (this.state(9:10)' + this.state(1:2)') .* 0.5 .* dt;
 
                 % Compute marks at time t for the current scan
                 newRanges = this.sensors(this.rangeFinderIndices);
                 newMarks = [newRanges .* cos(this.angles) newRanges .* sin(this.angles)];
                 [newMarksLeft, newMarksRight] = groupRangeFinders(newMarks, 10);
 
-                yawrate = fminsearch(@(x) computeProjectionError(marksLeft, marksRight, move, newMarksLeft, newMarksRight, x), yawRate, this.options);
+                yawrate = fminsearch(@(x) computeProjectionError(marksLeft, marksRight, move, newMarksLeft, newMarksRight, x), yawrate, this.options);
 
-                yawrate = yawRate * ALPHA;
+                yawrate = yawrate * ALPHA;
                 
-                % Now we have a better estimate for the yawrate at time t-1
                 yawrate = yawrate / dt;
             catch e
-                disp('Error in yaw rate estimation');
+                %error('Error in yaw rate estimation');
+                rethrow(e);
             end
         end
         

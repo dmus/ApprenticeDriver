@@ -127,7 +127,7 @@ classdef EpisodeDebugger < handle
             end
         end
         
-        function simulate(this)
+        function simulateOld(this)
             
             for t = 1:this.H-1
                 dt = this.T(t+1) - this.T(t);
@@ -152,6 +152,9 @@ classdef EpisodeDebugger < handle
                 
                 this.plotModel(t, s, z_t);
             end
+        end
+        
+        function simulate(this)
         end
         
 %         function ret = f(this, s, u, dt, el)

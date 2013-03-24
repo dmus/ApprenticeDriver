@@ -17,7 +17,7 @@ function [X,Y] = build_dataset(k, use_symmetry)
         'Wheel-2_MrRacer.mat'
     };
 
-    X = zeros(0, 5 * k);
+    X = zeros(0, 8 * k);
     Y = zeros(0, 3);
     
     for i = 1:length(files)
@@ -31,24 +31,23 @@ function [X,Y] = build_dataset(k, use_symmetry)
         U = compute_actions(actuators);
         times = compute_discretized_times(sensors);
         
-        X_new = zeros(size(S,1) - k + 1, 5 * k);
+        X_new = zeros(size(S,1) - k + 1, 8 * k);
         Y_new = zeros(size(S,1) - k + 1, 3);
         
         for t = k:size(S,1)-1
             y = zeros(1,3);
-            x = zeros(1,5*k);
+            x = zeros(1,8*k);
             
             % First compute the accelerations
             dt = times(t+1) - times(t);
             angle = S(t+1,3) * dt;
             Rot = [cos(-angle) -sin(-angle); sin(-angle) cos(-angle)];
             
-            y(1:2) = (Rot * S(t+1,1:2)') - S(t,1:2)';
-            y(3) = S(t+1,3) - S(t,3);
-            y = y / dt;
+            y(1:2) = ((Rot * S(t+1,1:2)') - S(t,1:2)') / dt;
+            y(3) = (S(t+1,3) - S(t,3)) / dt;
             
             % Now the x values
-            x(1:5) = [U(t,:) S(t,1:3)];
+            x(1:8) = [U(t,:) S(t,1:6)];
             
             % Add previous state-action pairs
             angle = 0;

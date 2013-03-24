@@ -1,4 +1,4 @@
-function [A,B,Q,R] = approximate_lqr(reference, alpha, model, map, bias)
+function [A,B,Q,R] = approximate_lqr(reference, f, g, alpha, model, map, bias)
 %APPROXIMATE_LQR Approximate a standard linear-time varying LQR problem.
 %   Dynamics and cost matrices are approximated with Taylor expansions.
     
@@ -10,7 +10,7 @@ function [A,B,Q,R] = approximate_lqr(reference, alpha, model, map, bias)
     H = size(S,1);
     
     % State cost function
-    g = @g_general;
+    %g = @g_general;
     
     n_states = size(S,2);
     n_inputs = size(U,2);
@@ -59,7 +59,7 @@ function [A,B,Q,R] = approximate_lqr(reference, alpha, model, map, bias)
         end
         
         % Matrix to penalize change in control inputs
-        Rprime{t} = 0.1 * eye(2);
+        Rprime{t} = 1 * eye(2);
                  
     end
 

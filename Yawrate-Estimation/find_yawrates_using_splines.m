@@ -29,6 +29,12 @@ function [yawrates, uncertainty] = find_yawrates_using_splines(sensors, replaceN
             fprintf('t:%d = %0.3f\n', t, times(t));
         end
         
+        % If outside track not possible
+        if abs(sensors(t,69)) > 1
+            yawrates(t) = NaN;
+            continue;
+        end
+        
         % Compute move
         dt = times(t) - times(t-1);
         translation = [.5*(S(t-1,1)+S(t,1)) .5*(S(t-1,2)+S(t,2))] .* dt;
@@ -107,7 +113,15 @@ function [yawrates, uncertainty] = find_yawrates_using_splines(sensors, replaceN
     if replaceNaN
         nans = find(isnan(yawrates));
         % Interpolate to get an estimate
-        yawrates(nans) = (yawrates(nans - 1) + yawrates(nans + 1)) / 2;
+        for i = 1:length(nans)
+            neighbours = [nans(i)-2:nans(i)-1 nans(i)+1:nans(i)+2];
+           
+            % Respect limits
+            neighbours(neighbours > length(yawrates)) = [];
+            neighbours(neighbours < 1) = [];
+            
+            yawrates(nans(i)) = mean(yawrates(neighbours));
+        end
     end
 end
 

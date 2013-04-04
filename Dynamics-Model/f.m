@@ -38,6 +38,6 @@ function s_next = f(s, u, dt, model, map)
     s_next(1:2) = Rot * (s(1:2) + accelerations(1:2) * dt); 
     s_next(3) = s(3) + accelerations(3) * dt;
     
-    %s_next(4:6) = phi(s(1:3) * dt, map, s(4:6));
+    s_next(4:6) = phi(s(1:3) * dt, map, s(4:6));
 end
 

@@ -7,6 +7,9 @@ function trajectory = build_trajectory(filename, k, H)
     % Remove states and actions before start signal
     sensors = S.States(S.States(:,2) > 0,:);
     actuators = S.Actions(S.States(:,2) > 0,:);
+    
+    H = min(H,size(sensors,1));
+    
     times = compute_discretized_times(sensors(1:H,:));
     
     X = zeros(H, k*8);

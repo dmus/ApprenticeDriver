@@ -3,7 +3,7 @@ function [Q, R] = quadraticize_costs(g, h, x_ref, u_ref, my_eps)
 %   Detailed explanation goes here
 
     x_eps = my_eps;
-    u_eps = my_eps;
+    u_eps = 0.01;
 
     % Constant term
     q_0 = g(x_ref);
@@ -115,6 +115,21 @@ function [Q, R] = quadraticize_costs(g, h, x_ref, u_ref, my_eps)
     
     % To quadratic form
     R = [0.5*R 0.5*r;0.5*r' r_0];
+    
+%     [X,Y] = meshgrid(-2:.2:2);
+%     Z = zeros(size(X));
+%     for i = 1:length(X)
+%         for j = 1:length(Y)
+%             u = [X(i,j) Y(i,j)]';
+%             
+%             % u to v
+%             v = [u - u_ref; 1];
+%             Z(i,j) = v' * R * v;
+%         end
+%     end
+%     surf(X,Y,Z);
+%     xlabel('gas/brake');
+%     ylabel('steering');
 end
 
 

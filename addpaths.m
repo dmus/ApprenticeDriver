@@ -1,5 +1,4 @@
 % External dependencies
-addpath Utilities/libsvm
 addpath Utilities/minFunc
 
 addpath Data

@@ -8,10 +8,12 @@ cd(oldDir);
 % Now start the client
 H = 250;
 reference = build_trajectory('Wheel-2_MrRacer.mat', 10, H);
-map = [];
+%map = [];
+load('map.mat');
 load('model.mat');
 driver = Controller(H, reference, model, map);
 
+% Run client for one episode
 client = Client(driver, H, 1);
 output = evalc('client.run()');
 

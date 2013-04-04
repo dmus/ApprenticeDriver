@@ -87,7 +87,12 @@ classdef Client < handle
                                 curStep = curStep + 1;
                             end
                             
-                            action = this.driver.control(sensors);
+                            % Check if not outside track
+                            if abs(sensors(69)) > 1
+                                action(6) = true;
+                            else
+                                action = this.driver.control(sensors);
+                            end
                         else
                             action(6) = true; % Restart race
                         end

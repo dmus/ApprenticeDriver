@@ -163,7 +163,70 @@ classdef Controller < handle
             dv = this.K{this.t} * z;
             v = this.vPrev + dv;
             u = v + this.reference.U(this.t,:)';
+            
+            % Cap u
+            u(u > 1) = 1;
+            u(u < -1) = -1;
+            
             this.history.U(this.t,:) = u;
+            
+            % DEBUG BEGIN
+%             fun = @(x) z' * this.Q{this.t} * z + x' * this.R{this.t} * x + (this.A{this.t} * z + this.B{this.t} * x)' * this.P{this.t+1} * (this.A{this.t} * z + this.B{this.t} * x);
+%             vprime = fminsearch(fun,[0 0]');
+%             
+%             cost1 = z' * this.Q{this.t} * z;
+%             cost2 = g_constantspeed(this.state) + h(u);
+%             
+%             s_plus1 = f(this.state,u,.02,this.model,this.map);
+%             z_plus1 = this.A{this.t} * z + this.B{this.t} * dv;
+%             s_plus1L = z_plus1(1:78) + this.reference.S(this.t+1,1:78)';
+%             
+%             v_plus1 = u - this.reference.U(this.t+1,:)';
+%             dv_plus1 = v_plus1 - v;
+%             s_plus2 = f(s_plus1, u, .02, this.model, this.map);
+%             z_plus2 = this.A{this.t+1} * z_plus1 + this.B{this.t+1} * dv_plus1;
+%             s_plus2L = z_plus2(1:78) + this.reference.S(this.t+2,1:78)';
+%             
+%             v_plus2 = u - this.reference.U(this.t+2,:)';
+%             dv_plus2 = v_plus2 - v_plus1;
+%             s_plus3 = f(s_plus2, u, .02, this.model, this.map);
+%             z_plus3 = this.A{this.t+2} * z_plus2 + this.B{this.t+2} * dv_plus2;
+%             s_plus3L = z_plus3(1:78) + this.reference.S(this.t+3,1:78)';
+%             
+%             v_plus3 = u - this.reference.U(this.t+3,:)';
+%             dv_plus3 = v_plus3 - v_plus2;
+%             s_plus4 = f(s_plus3, u, .02, this.model, this.map);
+%             z_plus4 = this.A{this.t+3} * z_plus3 + this.B{this.t+3} * dv_plus3;
+%             s_plus4L = z_plus4(1:78) + this.reference.S(this.t+4,1:78)';
+%             
+%             % Also look at an alternative action
+%             u_ = [1;-1];
+%             v_ = u_ - this.reference.U(this.t,:)';
+%             dv_ = v_ - this.vPrev;
+%             z_plus1_ = this.A{this.t} * z + this.B{this.t} * dv_;
+%             
+%             s_plus1_ = f(this.state,u_,.02,this.model,this.map);
+%             s_plus1L_ = z_plus1_(1:78) + this.reference.S(this.t+1,1:78)';
+%             
+%             v_plus1_ = u_ - this.reference.U(this.t+1,:)';
+%             dv_plus1_ = v_plus1_ - v_;
+%             s_plus2_ = f(s_plus1_, u_, .02, this.model, this.map);
+%             z_plus2_ = this.A{this.t+1} * z_plus1_ + this.B{this.t+1} * dv_plus1_;
+%             s_plus2L_ = z_plus2_(1:78) + this.reference.S(this.t+2,1:78)';
+%             
+%             v_plus2_ = u_ - this.reference.U(this.t+2,:)';
+%             dv_plus2_ = v_plus2_ - v_plus1_;
+%             s_plus3_ = f(s_plus2_, u_, .02, this.model, this.map);
+%             z_plus3_ = this.A{this.t+2} * z_plus2_ + this.B{this.t+2} * dv_plus2_;
+%             s_plus3L_ = z_plus3_(1:78) + this.reference.S(this.t+3,1:78)';
+%             
+%             v_plus3_ = u_ - this.reference.U(this.t+3,:)';
+%             dv_plus3_ = v_plus3_ - v_plus2_;
+%             s_plus4_ = f(s_plus3_, u_, .02, this.model, this.map);
+%             z_plus4_ = this.A{this.t+3} * z_plus3_ + this.B{this.t+3} * dv_plus3_;
+%             s_plus4L_ = z_plus4_(1:78) + this.reference.S(this.t+4,1:78)';
+%             
+            % DEBUG END
             
             % For next timestep
             this.vPrev = v;
@@ -178,9 +241,9 @@ classdef Controller < handle
             
             % Compute and solve new optimal control problem
             
-            % this.reference = this.history;
+            this.reference = this.history;
             
-            %this.onStart();
+            this.onStart();
         end
         
         function shutdown(this)
@@ -194,7 +257,11 @@ classdef Controller < handle
             s(1:2) = this.sensors(47:48) * 1000 / 3600;
             
             % Angular velocity in rad/s
-            s(3) = this.estimateYawrate();
+            if abs(this.sensors(69)) <= 1
+                s(3) = this.estimateYawrate();
+            else
+                s(3) = NaN;
+            end
 
             % State features
             s(4:6) = this.sensors([4 69 1]);
@@ -241,6 +308,10 @@ classdef Controller < handle
                 yawrate = yawrate / dt;
             catch e
                 %error('Error in yaw rate estimation');
+                reference = this.sensorsPrev;
+                current = this.sensors;
+                history = this.history;
+                save('debug.mat','reference','current','history');
                 rethrow(e);
             end
         end

@@ -25,7 +25,7 @@ function [A,B,Q,R] = approximate_lqr(reference, f, g, alpha, model, map, bias)
         % Control input and time difference
         u_ref = U(t,:)';
         dt = times(t+1) - times(t);
-
+        
         % Linearize dynamics around reference trajectory
         f_t = @(s_ref, u_ref, dt, model, map) f(s_ref, u_ref, dt, model, map) + bias(t,:)';
         [A{t}, B{t}, c{t}] = linearize_dynamics(f_t, s_ref, u_ref, dt, my_eps, s_ref_tplus1, model, map);
@@ -41,6 +41,7 @@ function [A,B,Q,R] = approximate_lqr(reference, f, g, alpha, model, map, bias)
         
         % Penalize deviations from reference trajectory
         Q{t} = (1 - alpha) * Q{t} + alpha * [eye(n_states) zeros(n_states,1); zeros(1,n_states + 1)];
+        %Q{t} = zeros(size(Q{t}));
         R{t} = (1 - alpha) * R{t} + alpha * [eye(n_inputs) zeros(n_inputs,1); zeros(1,n_inputs + 1)];
         
         % Augment matrices

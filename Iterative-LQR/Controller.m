@@ -94,8 +94,9 @@ classdef Controller < handle
             else
                 this.bias = zeros(this.H-1, this.stateDim);
             end
-                
+            tic
             [this.A, this.B, this.Q, this.R] = approximate_lqr(this.reference, @f, @g_constantspeed, this.alpha, this.model, this.map, this.bias);
+            toc
             [this.K, this.P] = create_time_varying_controller(this.A, this.B, this.Q, this.R, this.Q{this.H});
         end
         
@@ -271,8 +272,6 @@ classdef Controller < handle
             
             % Shift previous states
             s(9:end) = this.state(1:end-8);
-            
-            % TODO rotate
         end
         
         % Estimate yaw rate at time t.

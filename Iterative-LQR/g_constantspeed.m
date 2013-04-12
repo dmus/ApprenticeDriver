@@ -3,9 +3,6 @@ function cost = g_constantspeed(s)
 %   Detailed explanation goes here
     
     % Penalize deviation from 5 km/h
-    %cost = (s(1) - 1.3899) ^ 2;
-    %cost = (s(3) - 0.2)^2;
-    cost = s(6)^2;
-    %cost = 0;
+    cost = (s(1) - 13.8889) ^2 + s(3) ^2;
 end
 

@@ -5,8 +5,9 @@ function cost = h(u)
     % Limits should be respected
     a = max(0,abs(u)-1);
     cost = 10000 * (a' * a);
-    cost = 0;
+%     cost = 0;
+%     cost = (u(2))^2;
 
-    %cost = (u(1) - 1)^2 + u(2)^2;
+%     cost = 0.01 * (u(1)^2 + u(2)^2);
 end
 

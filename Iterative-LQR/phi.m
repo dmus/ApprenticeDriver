@@ -36,8 +36,12 @@ function f = phi(s, map, current)
     distance_to_p1 = current(1) - map(prev_index,1);
     distance_to_p2 = map(index,1) - current(1);
     
-    if prev_index == size(map,1)
+    if distance_to_p1 < 0 && prev_index == size(map,1)
         distance_to_p1 = current(1) + (trackLength - map(end,1));
+    end
+    
+    if distance_to_p2 < 0 && prev_index == size(map,1)
+        distance_to_p2 = (trackLength - current(1)) + map(1,1);
     end
     
     p1 = track + [distance_to_p1 * cos(alpha + pi); distance_to_p1 * sin(alpha + pi)];
@@ -110,6 +114,5 @@ function f = phi(s, map, current)
     if f(1) >= trackLength
         f(1) = f(1) - trackLength;
     end
-    f(1) = 0;
 end
 

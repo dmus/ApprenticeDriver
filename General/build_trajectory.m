@@ -8,7 +8,11 @@ function trajectory = build_trajectory(filename, k, H)
     sensors = S.States(S.States(:,2) > 0,:);
     actuators = S.Actions(S.States(:,2) > 0,:);
     
-    H = min(H,size(sensors,1));
+    if nargin == 3
+        H = min(H,size(sensors,1));
+    else
+        H = size(sensors,1);
+    end
     
     times = compute_discretized_times(sensors(1:H,:));
     

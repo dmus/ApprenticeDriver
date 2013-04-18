@@ -76,7 +76,7 @@ features = logical(features);
 
 H = 10000;
 if ~exist('r', 'var')
-    r = build_trajectory('Wheel-2_MrRacer.mat', 10, H);
+    r = build_trajectory('E-Track-2_MrRacer.mat', 10, H);
 end
 x = 1:H;
 
@@ -140,46 +140,46 @@ hold on;
 plot(window, Xprime * theta, '-ks', 'Markersize', 2);
 hold off;
 
-% %% Longitudinal acceleration
-% window = 3730:3950;
-% Xprime = X(window,features(1,:));
-% Yprime = Y(window,:);
-% disp('Longitudinal theta');
-% theta = pinv(Xprime' * Xprime + lambda * eye(size(Xprime,2))) * Xprime' * Yprime(:,1)
-% model(1,features(1,:)) = theta';
-% hprime = Xprime * theta;
-% h = X(:,features(1,:)) * theta;
-% x = 1:size(X,1);
-% 
-% mse = ((hprime - Yprime(:,1))' * (hprime - Yprime(:,1))) / length(window)
-% 
-% figure;
-% % plot(window, r.U(window,1),'-rs', window, r.S(window,1) ./ 100, '-gs', window, r.S(window,2) .* r.S(window,3), '-ys', window,  Yprime(:,1), '-bs', 'Markersize', 1);
-% plot(x, r.U(:,1),'-rs', x, r.S(:,1) ./ 10, '-gs', x, r.S(:,2) .* r.S(:,3), '-ys', x(1:end-1),  Y(:,1), '-bs', 'Markersize', 1);
-% hold on;
-% 
-% % plot(window, Xprime * theta, '-ks', 'Markersize', 2);
-% x = 1:size(X,1);
-% plot(x, h, '-ks', 'Markersize', 2);
-% hold off;
-% 
-% %% Lateral acceleration
-% window = 3200:3700;
-% Xprime = X(window,features(2,:));
-% Yprime = Y(window,:);
-% disp('Lateral theta');
-% theta = pinv(Xprime' * Xprime + lambda * eye(size(Xprime,2))) * Xprime' * Yprime(:,2)
-% %theta = [-0.1; -0.31]; % TODO fix
-% model(2,features(2,:)) = theta';
-% h = X(:,features(2,:)) * theta;
-% 
-% figure;
-% % plot(window, r.U(window,1),'-rs', window, r.S(window,1) ./ 100, '-gs', window, r.S(window,2) .* r.S(window,3), '-ys', window,  Yprime(:,1), '-bs', 'Markersize', 1);
-% delta = (r.S(2:end-2,1) .* r.S(2:end-2,3)) - (r.S(1:end-3,1) .* r.S(1:end-3,3));
-% delta = [0; delta];
-% plot(x, r.S(:,2), '-gs', x, r.S(:,1) .* r.S(:,3), '-rs', x(1:end-1),  Y(:,2), '-bs', 'Markersize', 1);
-% hold on;
-% 
-% x = 1:size(X,1);
-% plot(x, h, '-ks', 'Markersize', 2);
-% hold off;
+%% Longitudinal acceleration
+window = 3730:3950;
+Xprime = X(window,features(1,:));
+Yprime = Y(window,:);
+disp('Longitudinal theta');
+theta = pinv(Xprime' * Xprime + lambda * eye(size(Xprime,2))) * Xprime' * Yprime(:,1)
+model(1,features(1,:)) = theta';
+hprime = Xprime * theta;
+h = X(:,features(1,:)) * theta;
+x = 1:size(X,1);
+
+mse = ((hprime - Yprime(:,1))' * (hprime - Yprime(:,1))) / length(window)
+
+figure;
+% plot(window, r.U(window,1),'-rs', window, r.S(window,1) ./ 100, '-gs', window, r.S(window,2) .* r.S(window,3), '-ys', window,  Yprime(:,1), '-bs', 'Markersize', 1);
+plot(x, r.U(:,1),'-rs', x, r.S(:,1) ./ 10, '-gs', x, r.S(:,2) .* r.S(:,3), '-ys', x(1:end-1),  Y(:,1), '-bs', 'Markersize', 1);
+hold on;
+
+% plot(window, Xprime * theta, '-ks', 'Markersize', 2);
+x = 1:size(X,1);
+plot(x, h, '-ks', 'Markersize', 2);
+hold off;
+
+%% Lateral acceleration
+window = 3200:3700;
+Xprime = X(window,features(2,:));
+Yprime = Y(window,:);
+disp('Lateral theta');
+theta = pinv(Xprime' * Xprime + lambda * eye(size(Xprime,2))) * Xprime' * Yprime(:,2)
+%theta = [-0.1; -0.31]; % TODO fix
+model(2,features(2,:)) = theta';
+h = X(:,features(2,:)) * theta;
+
+figure;
+% plot(window, r.U(window,1),'-rs', window, r.S(window,1) ./ 100, '-gs', window, r.S(window,2) .* r.S(window,3), '-ys', window,  Yprime(:,1), '-bs', 'Markersize', 1);
+delta = (r.S(2:end-2,1) .* r.S(2:end-2,3)) - (r.S(1:end-3,1) .* r.S(1:end-3,3));
+delta = [0; delta];
+plot(x, r.S(:,2), '-gs', x, r.S(:,1) .* r.S(:,3), '-rs', x(1:end-1),  Y(:,2), '-bs', 'Markersize', 1);
+hold on;
+
+x = 1:size(X,1);
+plot(x, h, '-ks', 'Markersize', 2);
+hold off;

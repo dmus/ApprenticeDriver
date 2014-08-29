@@ -29,6 +29,8 @@ function map = build_map(S, times)
     for t = 1:len
         angle = S(t,6);
         orientation = P(t,3);
+        
+        % orientation - track angle is angle with respect to reference frame of track axis 
         alpha = orientation - angle;
         trackPos = S(t,5) * (TRACKWIDTH / 2);
           

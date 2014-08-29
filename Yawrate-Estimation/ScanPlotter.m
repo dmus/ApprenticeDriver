@@ -27,28 +27,28 @@ classdef ScanPlotter < handle
             
             % First plot the reference position and the current position
             figure;
-            plot(0,0,'dm', C.position(1),C.position(2),'dc');
+            plot(0,0,'dr','MarkerFaceColor','red')
             hold on;
-    
+            plot(C.position(1),C.position(2),'pb','MarkerFaceColor','blue');
             % Now the edges for the reference scan, first the right
             first = R.segments(1,1);
             last = R.segments(1,2);
-            plot(R.points(first:last,1),R.points(first:last,2),'+r');
+            plot(R.points(first:last,1),R.points(first:last,2),'sr', 'MarkerFaceColor', 'red', 'MarkerSize',5);
     
             % Interpolate to get nice curve
             xx = R.points(first,1):.01:R.points(last,1);
             yy = spline(R.points(first:last,1),R.points(first:last,2),xx);
-            plot(xx,yy,'-r');
+            plot(xx,yy,'-r', 'LineWidth', 1.2);
     
             % Same for left edge of reference scan
             first = R.segments(2,1);
             last = R.segments(2,2);
-            plot(R.points(first:last,1),R.points(first:last,2),'+r');
+            plot(R.points(first:last,1),R.points(first:last,2),'sr', 'MarkerFaceColor', 'red', 'MarkerSize',5);
 
             % Interpolate to get nice curve
             xx = R.points(last,1):.01:R.points(first,1);
             yy = spline(R.points(first:last,1),R.points(first:last,2),xx);
-            plot(xx,yy,'-r');
+            plot(xx,yy,'-r', 'LineWidth', 1.2);
 
             % Translate and rotate current scan
             currentScan = bsxfun(@plus,C.points,C.position);
@@ -57,7 +57,7 @@ classdef ScanPlotter < handle
             % Now the edges for the current scan, first the right
             first = C.segments(1,1);
             last = C.segments(1,2);
-            plot(currentScan(first:last,1),currentScan(first:last,2),'+b');
+            plot(currentScan(first:last,1),currentScan(first:last,2),'ob','MarkerFaceColor', 'blue', 'MarkerSize',3);
 
         %     % Interpolate to get nice curve
         %     xx = currentScan(first,1):.01:currentScan(last,1);
@@ -67,7 +67,7 @@ classdef ScanPlotter < handle
             % Same for left edge of current scan
             first = C.segments(2,1);
             last = C.segments(2,2);
-            plot(currentScan(first:last,1),currentScan(first:last,2),'+b');
+            plot(currentScan(first:last,1),currentScan(first:last,2),'ob','MarkerFaceColor', 'blue', 'MarkerSize',3);
 
         %     % Interpolate to get nice curve
         %     xx = currentScan(last,1):.01:currentScan(first,1);

@@ -1,5 +1,5 @@
-% trajectory = build_trajectory('Wheel-2_MrRacer.mat', 6);
-trajectory = trajectory1;
+trajectory = build_trajectory('Wheel-2_MrRacer.mat', 6);
+%trajectory = trajectory1;
 accelerations = compute_accelerations(trajectory);
 
 splitIndex = ceil(0.7*size(trajectory.S,1));

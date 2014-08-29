@@ -1,0 +1,80 @@
+% This file was created by matlab2tikz v0.4.7 running on MATLAB 8.3.
+% Copyright (c) 2008--2014, Nico Schlömer <nico.schloemer@gmail.com>
+% All rights reserved.
+% Minimal pgfplots version: 1.3
+% 
+% The latest updates can be retrieved from
+%   http://www.mathworks.com/matlabcentral/fileexchange/22022-matlab2tikz
+% where you can also make suggestions and rate matlab2tikz.
+% 
+\begin{tikzpicture}
+
+\begin{axis}[%
+width=\figurewidth,
+height=\figureheight,
+scale only axis,
+xmin=0.75,
+xmax=1.2,
+xlabel={Time (s)},
+ymin=-0.3,
+ymax=0.15,
+legend style={draw=black,fill=white,legend cell align=left}
+]
+\addplot [color=red,solid]
+  table[row sep=crcr]{%
+0.76	0.0003818359375\\
+0.78	0.0003818359375\\
+0.8	0\\
+0.82	-0.067871337890625\\
+0.84	-0.060330078125\\
+0.86	-0.211537109375\\
+0.88	-0.290958984375\\
+0.9	-0.278740234375\\
+0.92	-0.20924609375\\
+0.94	-0.122187500000001\\
+0.96	-0.032837890625\\
+0.98	0.0309287109375\\
+1	0.0846981534090909\\
+1.02	0.10538671875\\
+1.04	0.0931679687499999\\
+1.06	0.0763671874999999\\
+1.08	0.058802734375\\
+1.1	0.0462021484375\\
+1.12	0.038947265625\\
+1.14	0.0351289062500004\\
+1.16	0.032837890625\\
+1.18	0.032837890625\\
+1.2	0.030546875\\
+};
+\addlegendentry{yaw rate};
+
+\addplot [color=blue,dashed]
+  table[row sep=crcr]{%
+0.76	0.000672132838433925\\
+0.78	0.000674244997724809\\
+0.8	0.000617956569492741\\
+0.82	-0.226870902172642\\
+0.84	-0.211963166376427\\
+0.86	-0.160683169830215\\
+0.88	-0.0892574738993662\\
+0.9	-0.0196500005415777\\
+0.92	0.034616193711373\\
+0.94	0.068885651657901\\
+0.96	0.082639296372187\\
+0.98	0.0819640573303524\\
+1	0.0678585261844811\\
+1.02	0.0506377818973636\\
+1.04	0.0367902885449547\\
+1.06	0.0271424499364421\\
+1.08	0.0214335438294869\\
+1.1	0.018708418475895\\
+1.12	0.017665215024621\\
+1.14	0.0175727795225923\\
+1.16	0.0178310082646688\\
+1.18	0.0181538939261982\\
+1.2	0.0182615306299621\\
+};
+\addlegendentry{steering input};
+
+\end{axis}
+\end{tikzpicture}%

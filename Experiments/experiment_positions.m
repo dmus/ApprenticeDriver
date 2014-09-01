@@ -47,6 +47,36 @@ for t = 1:length(testWindow)-1
     signsAcc = signsAcc + (sign(delta) == sign(deltaPredicted));
 end
 
+squaredErrorAcc = zeros(6,10);
+signsAcc = zeros(6,10);
+
+for t = 1:length(testWindow)-10
+    s = testTrajectory.S(t,:)';
+    u = testTrajectory.U(t,:)';
+    
+    for k = 1:10
+        % Prediction for t+k
+        dt = testTrajectory.T(t+k)-testTrajectory.T(t+k-1);
+        h = f(s, u, dt, model, map);
+        y = testTrajectory.S(t+k,:)';
+        
+        % Compute error
+        error = (y(1:6) - h(1:6)).^2;
+        squaredErrorAcc(:,k) = squaredErrorAcc(:,k) + error;
+        
+        % Increase/Decrease
+        delta = testTrajectory.S(t+k,1:6)' - testTrajectory.S(t+k-1,1:6)';
+        deltaPredicted = h(1:6) - testTrajectory.S(t+k-1,1:6)';
+    
+        signsAcc(:,k) = signsAcc(:,k) + (sign(delta) == sign(deltaPredicted));
+        
+        % For next iteration
+        s = h;
+        u = testTrajectory.U(t+k,:)';
+    end
+    
+end
+
 % Mean squared error
 mse = squaredErrorAcc ./ (length(testWindow)-1);
 

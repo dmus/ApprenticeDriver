@@ -56,12 +56,9 @@ function map = build_map(S, times)
         
         % Fix for if crossing border +pi/-pi
         if abs(angles(t+1) - angles(t)) > 3
-            rotation = angles(t+1) * -1 - angles(t);
-        else
-            % Normal case
-            rotation = angles(t+1) - angles(t);
+            rotation = angles(t+1) * -1 - angles(t;
         end
-
+        rotation = angles(t+1) - angles(t);
 %         rotation = atan2(track(t+1,2), track(t+1,1)) - atan2(track(t,2), track(t,1));
 
 %         R = [cos(totalRotation) -sin(totalRotation); sin(totalRotation) cos(totalRotation)];

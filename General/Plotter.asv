@@ -45,7 +45,7 @@ classdef Plotter < handle
             % Now we have one point on the map
         end
         
-        function addTrial(this, trial, color)
+        function addTrial(this, trial)
             % Starting state
             s1 = trial.S(1,:)';
             
@@ -56,9 +56,6 @@ classdef Plotter < handle
             X(1,:) = p';
             
             for t = 1:size(S,1)
-                s1 = trial.S(t,:)';
-                p = this.findPoint(s1);
-                X(t,:) = p';
             end
 %             for t = 1:size(S,1)-1
 %                 dt = trial.T(t+1) - trial.T(t);
@@ -68,7 +65,7 @@ classdef Plotter < handle
 %                 angle = angle + S(t+1,3) * dt;
 %             end
             figure(this.h);
-            plot(X(:,1),X(:,2), color);
+            plot(X(:,1),X(:,2), 'b');
         end
     end
     

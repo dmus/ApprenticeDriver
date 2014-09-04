@@ -14,7 +14,7 @@ trajectory.T = trajectory.T(starts(1):starts(2)-1,:);
 map = build_map(trajectory.S, trajectory.T);
 
 p = Plotter(map);
-window = 697:710;
+window = 500:700;%697:710;
 traj.S = trajectory.S(window,:);
 traj.U = trajectory.U(window,:);
 traj.T = trajectory.T(window,:);

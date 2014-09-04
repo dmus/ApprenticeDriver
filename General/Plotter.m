@@ -68,7 +68,7 @@ classdef Plotter < handle
 %                 angle = angle + S(t+1,3) * dt;
 %             end
             figure(this.h);
-            plot(X(:,1),X(:,2), color);
+            plot(X(:,1),X(:,2), color, 'LineWidth', 2);
         end
     end
     

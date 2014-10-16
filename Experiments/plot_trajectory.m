@@ -36,3 +36,25 @@ for t = window(1):window(end)-1
 end
 
 p.addTrial(sim, 'k');
+
+figure;
+ylabels = {'x', 'y', '\omega', 'p', 'q', '\alpha'};
+%locations = {'NorthEast', 'NorthEast', 'SouthWest', 'SouthEast', 'NorthWest', 'NorthWest'};
+for i = 1:6
+    subplot(3,2,i);
+    plot(traj.T, traj.S(:,i), '--r', sim.T, sim.S(:,i), '-b');
+    %legend('Real', 'Predicted', 'Location', locations{i});
+    xlabel('t (s)');
+    ylabel(ylabels(i));
+end
+
+figure;
+subplot(1,2,1);
+plot(traj.T, traj.U(:,1));
+xlabel('t (s)');
+title('u1');
+
+subplot(1,2,2);
+plot(traj.T, traj.U(:,2));
+title('u2');
+xlabel('t (s)');

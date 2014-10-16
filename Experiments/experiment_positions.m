@@ -82,3 +82,12 @@ mse = squaredErrorAcc ./ (length(testWindow)-1);
 
 % Check increase/decrease
 signsCorrect = signsAcc ./ (length(testWindow)-1);
+
+t = 0.02:0.02:0.2;
+titels = {'\dot{x}', '\dot{y}', '\dot{\omega}', 'p', 'q', '\alpha'};
+for i = 1:6
+    subplot(2,3,i);
+    plot(t,mse(i,:));
+    xlabel('t(s)');
+    title(titels(i));
+end

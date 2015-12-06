@@ -54,7 +54,7 @@ classdef Controller < handle
             obj.episode = 0;
             %obj.previousState = zeros(stateLength,1);
             
-            obj.alpha = 0; 
+            obj.alpha = 0.5; 
             obj.rangeFinderIndices = (1:19) + 49;
             indices = 1:19;
             obj.angles = transp(((indices - 10) / 9) * (0.5*pi) * -1);
@@ -92,7 +92,7 @@ classdef Controller < handle
                 end
                 
             else
-                this.bias = zeros(this.H-1, this.stateDim);
+                this.bias = zeros(this.H, this.stateDim);
             end
             tic
             [this.A, this.B, this.Q, this.R] = approximate_lqr(this.reference, @f, @g_constantspeed, this.alpha, this.model, this.map, this.bias);
@@ -238,7 +238,11 @@ classdef Controller < handle
             
             this.clutchBehaviour.reset();
             this.gearChangeBehaviour.reset();
-            %this.alpha = this.alpha - 0.1;
+            this.alpha = this.alpha - 0.25;
+            
+            if this.alpha < 0
+                this.alpha = 0;
+            end
             
             % Compute and solve new optimal control problem
             

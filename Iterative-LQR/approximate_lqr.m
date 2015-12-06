@@ -60,7 +60,7 @@ function [A,B,Q,R] = approximate_lqr(reference, f, g, alpha, model, map, bias)
         end
         
         % Matrix to penalize change in control inputs
-        Rprime{t} = 1 * eye(2);
+        Rprime{t} = 10 * eye(2);
                  
     end
 
